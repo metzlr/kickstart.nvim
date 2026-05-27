@@ -245,6 +245,24 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- reed: Added this. It should make files automatically refresh with changes
+  vim.o.autoread = true
+  local checktime_group = vim.api.nvim_create_augroup("Checktime", { clear = true })
+  vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold" }, {
+    group = checktime_group,
+    pattern = "*",
+    callback = function()
+      -- Only check if we are in Normal mode, and the buffer is a normal, unmodified file
+      if vim.api.nvim_get_mode().mode == "n"
+         and vim.bo.buftype == ""
+         and not vim.bo.modified
+      then
+        vim.cmd("checktime")
+      end
+    end,
+  })
+
 end
 
 -- ============================================================
